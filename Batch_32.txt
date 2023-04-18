@@ -1,0 +1,61 @@
+!pip install ultralytics
+
+
+!pip install easyocr
+
+!pip install roboflow
+
+from roboflow import Roboflow
+rf = Roboflow(api_key="4FWI61VcX8nLon1Z1sm8")
+project = rf.workspace().project("helmet-detection-gffnh")
+model = project.version(1).model
+
+img = "/content/nohelmet1.jpeg"
+
+# infer on a local image
+print(model.predict(img).json())
+results=model.predict(img).json()
+# visualize your prediction
+model.predict(img).save("prediction.jpg")
+
+# infer on an image hosted elsewhere
+#result=model.predict("https://www.shutterstock.com/image-photo/delhi-india-03072020-three-people-260nw-1684628260.jpg", hosted=True, confidence=10, overlap=30).json()
+
+
+
+results
+
+import cv2
+
+image = cv2.imread(img)
+
+import cv2
+
+image = cv2.imread(img)
+
+prediction = {'x': 405,
+   'y': 840,
+   'width': 111,
+   'height': 80,}
+
+roi_x = int(prediction['x'] - prediction['width'] / 2)
+roi_y = int(prediction['y'] - prediction['height'] / 2)
+roi_width = int(prediction['width'])
+roi_height = int(prediction['height'])
+
+roi = image[roi_y:roi_y+roi_height, roi_x:roi_x+roi_width]
+
+cv2.imwrite('plate.jpg',roi)
+
+results['predictions'][0]['class']
+
+import easyocr
+
+if results['predictions'][0]['class']=='NOHELMET' or "PLATE":
+  reader = easyocr.Reader(['en'])
+  plate=cv2.imread('/content/plate.jpg',0)
+  cv2.imwrite('plate0.jpg',plate)
+  platen = reader.readtext('/content/plate0.jpg',paragraph="False")
+  print("\n")
+  print('Fine Imposed for plate',platen[0][1])
+
